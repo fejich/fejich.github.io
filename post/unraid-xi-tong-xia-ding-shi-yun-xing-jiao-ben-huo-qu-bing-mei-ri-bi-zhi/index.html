@@ -1,0 +1,273 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>unRAID 系统下定时运行脚本获取 bing每日壁纸 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="unRAID 系统下定时运行脚本获取 bing每日壁纸 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖前言
+最近 Fork 了一个使用  GitHub Action 自动抓取bing壁纸的项目
+https://github.com/yfun-lab/bing-wallpaper
+感觉项目的Python脚本写得十分优雅，按个人的习惯简单修..." />
+    <meta name="keywords" content="unRAID,NAS" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              unRAID 系统下定时运行脚本获取 bing每日壁纸
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-08
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/unraid/" class="post-tag">
+                  # unRAID
+                </a>
+              
+                <a href="https://fejich.github.io/tag/nas/" class="post-tag">
+                  # NAS
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/unraid-xi-tong-xia-ding-shi-yun-xing-jiao-ben-huo-qu-bing-mei-ri-bi-zhi.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">📖前言</h2>
+<p>最近 Fork 了一个使用  GitHub Action 自动抓取bing壁纸的项目</p>
+<p>https://github.com/yfun-lab/bing-wallpaper</p>
+<p>感觉项目的Python脚本写得十分优雅，按个人的习惯简单修改了脚本部署到自己的 GitHub 上。<br>
+同时顺手在本地 NAS 上也跑一个，供日常观赏。</p>
+<h2 id="操作步骤">🔨操作步骤</h2>
+<h3 id="1安装所需的运行环境">1）安装所需的运行环境</h3>
+<p>首先于 unRAID  <code>Community Applications</code> 安装 <strong>Nerd Tools</strong> 和 <strong>User Scripts</strong> 两个插件</p>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631240567548.png" alt="" loading="lazy"></figure>
+<p>然后打开 <strong>Nerd Tools</strong> 安装 <code>Python3</code></p>
+<figure data-type="image" tabindex="2"><img src="https://fejich.github.io/post-images/1631240579291.png" alt="" loading="lazy"></figure>
+<p>至此所需的运行环境就部署完成了</p>
+<h3 id="2运行脚本">2）运行脚本</h3>
+<p>保存为 <code>main.py</code> ，同时于同目录建一个 <code>Wallpaper</code> 文件夹用于存放下载来的文件</p>
+<p>在终端使用 <code>python3 main.py</code> 测试脚本是否正常运作</p>
+<pre><code class="language-python">import urllib.request as req
+import json
+import re
+
+
+url = 'http://cn.bing.com/HPImageArchive.aspx?format=js&amp;idx=0&amp;n=1&amp;nc=1614319565639&amp;pid=hp&amp;FORM=BEHPTB&amp;uhd=1&amp;uhdwidth=3840&amp;uhdheight=2160'
+
+# try:
+res = req.urlopen(url)
+res = res.read().decode('utf-8')
+
+api = json.loads(res)
+
+api = api['images']
+downloadURL = &quot;https://bing.com&quot; + api[0]['url']
+dateTime = api[0]['enddate']
+copyright = api[0]['copyright'] # 获取版权信息
+rstr = r'[\/\\\:\*\?\&quot;\&lt;\&gt;\|]'  # '/ \ : * ? &quot; &lt; &gt; |'
+new_copyright = re.sub(rstr, '_', copyright)  # 替换为下划线
+
+req.urlretrieve(downloadURL, &quot;./Wallpaper/{0}{1}{2}.jpg&quot;.format(dateTime, '@', new_copyright))
+req.urlretrieve(url, &quot;./Wallpaper/{}.json&quot;.format(dateTime))
+
+# except:
+#     print(&quot;Error.&quot;)
+</code></pre>
+<blockquote>
+<p>于原项目基础上修改了图片保存的目录与文件名（按 日期@版权信息 命名）<br>
+增加保存当日完整的 json 信息到本地，以供日后可能有用得上的时候</p>
+</blockquote>
+<h3 id="3配置定时执行">3）配置定时执行</h3>
+<figure data-type="image" tabindex="3"><img src="https://fejich.github.io/post-images/1631240598782.png" alt="" loading="lazy"></figure>
+<p>到 <strong>User Scripts</strong> 插件内添加一个新脚本，内容按实际情况编辑</p>
+<pre><code class="language-bash">#!/bin/bash
+cd /mnt/disk1/appdata/bing/ &amp;&amp; python3 main.py
+</code></pre>
+<p>最后设置 <a href="https://corntab.com/">Cron</a> 计划任务定时运行</p>
+<p><code>2 0 * * *</code></p>
+<blockquote>
+<p>每日凌晨零点02分</p>
+</blockquote>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">📖前言</a></li>
+<li><a href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4">🔨操作步骤</a>
+<ul>
+<li><a href="#1%E5%AE%89%E8%A3%85%E6%89%80%E9%9C%80%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83">1）安装所需的运行环境</a></li>
+<li><a href="#2%E8%BF%90%E8%A1%8C%E8%84%9A%E6%9C%AC">2）运行脚本</a></li>
+<li><a href="#3%E9%85%8D%E7%BD%AE%E5%AE%9A%E6%97%B6%E6%89%A7%E8%A1%8C">3）配置定时执行</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/dao-chu-shi-pin-nei-qian-zi-mu-wen-jian-de-liang-ge-fang-fa/">
+              <h3 class="post-title">
+                导出视频内嵌字幕文件的两个方法
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

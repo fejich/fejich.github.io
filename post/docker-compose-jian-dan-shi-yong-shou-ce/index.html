@@ -1,0 +1,308 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Docker Compose 简单使用手册 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Docker Compose 简单使用手册 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖介绍
+Docker Compose 是 Docker 官方编排（Orchestration）项目之一，负责快速的部署分布式应用。
+它允许用户通过一个单独的 docker-compose.yml 模板文件（YAML 格式）来定义一组相关联..." />
+    <meta name="keywords" content="Docker,Linux,unRAID,NAS,Synology" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Docker Compose 简单使用手册
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-10
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/docker/" class="post-tag">
+                  # Docker
+                </a>
+              
+                <a href="https://fejich.github.io/tag/linux/" class="post-tag">
+                  # Linux
+                </a>
+              
+                <a href="https://fejich.github.io/tag/unraid/" class="post-tag">
+                  # unRAID
+                </a>
+              
+                <a href="https://fejich.github.io/tag/nas/" class="post-tag">
+                  # NAS
+                </a>
+              
+                <a href="https://fejich.github.io/tag/synology/" class="post-tag">
+                  # Synology
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/docker-compose-jian-dan-shi-yong-shou-ce.jpg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="介绍">📖介绍</h2>
+<p>Docker Compose 是 Docker 官方编排（Orchestration）项目之一，负责快速的部署分布式应用。<br>
+它允许用户通过一个单独的 docker-compose.yml 模板文件（YAML 格式）来定义一组相关联的应用容器为一个项目（project）。</p>
+<p><strong>优点非常明显，通过易读的 YAML 格式文件。实现复杂容器部署，快速修改配置</strong></p>
+<h2 id="安装">🔩安装</h2>
+<p>群晖NAS系统内置就有 docker-compose ，为其工程师点赞</p>
+<h3 id="二进制包方式">二进制包方式</h3>
+<pre><code>sudo curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose
+
+# 国内用户可以使用以下方式加快下载
+sudo curl -L https://download.fastgit.org/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+</code></pre>
+<h3 id="docker-run-方式">Docker run 方式</h3>
+<p>适合 <code>unRAID</code> 这类精简 Linux 系统，使用 alias 命令别名方式实现免安装使用</p>
+<pre><code>echo alias docker-compose=&quot;'&quot;'docker run --rm --name docker-compose \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v &quot;$PWD:$PWD&quot; \
+    -w=&quot;$PWD&quot; \
+    docker/compose'&quot;'&quot; &gt;&gt;  ~/.bashrc
+
+source ~/.bashrc
+</code></pre>
+<p>推荐一同部署 ctop 这个可视化的容器管理程序</p>
+<pre><code>echo alias ctop=&quot;'&quot;'docker run --rm --name ctop -ti \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    quay.io/vektorlab/ctop'&quot;'&quot; &gt;&gt;  ~/.bashrc
+</code></pre>
+<h2 id="compose-模板文件">📝Compose 模板文件</h2>
+<p>默认的模板文件名称为 <code>docker-compose.yml</code>，格式为 YAML 格式。</p>
+<pre><code>---
+version: &quot;2.1&quot;
+services:
+  xxx:
+    image: uuuu/xxx
+    container_name: xxx
+    environment:
+#      - ALL_PROXY=socks5://192.168.168.4:7890
+      - PUID=1000
+      - PGID=100
+      - TZ=Asia/Shanghai
+#    tty: true
+#    privileged: true
+    volumes:
+      - ./config:/config
+    network_mode: bridge #host
+#    dns:
+#      - 8.8.8.8
+#    ports:
+#      - 8096:8096
+#    devices:
+#      - /dev/dri:/dev/dri #分配显卡给容器
+#    tmpfs:
+#      - /tmp #共享/tmp目录
+#    command: sh -c &quot;cd /config &amp;&amp; chmod a+x npc &amp;&amp; ./npc&quot;
+  mem_limit: 512m #限制容器可用内存
+  cpus: 0.5 #限制容器可用 CPU占比
+  restart: unless-stopped
+</code></pre>
+<h2 id="常用命令">📌常用命令</h2>
+<p>yaml 文件同目录内输入命令</p>
+<ul>
+<li>启动容器：<code>docker-compose up -d</code></li>
+<li>停止容器：<code>docker-compose down</code></li>
+<li>查看进程：<code>docker-compose top</code></li>
+<li>重启容器：<code>docker-compose restart</code></li>
+<li>查看日志：<code>docker-compose logs</code></li>
+<li>查看端口：<code>docker-compose port</code></li>
+<li>拉取镜像：<code>docker-compose pull</code></li>
+<li>进入容器内的终端：<code>docker-compose exec {container-name} sh</code></li>
+</ul>
+<hr>
+<h2 id="参考">📍参考</h2>
+<ul>
+<li><a href="https://www.jianshu.com/p/2217cfed29d7">Docker Compose 配置文件详解</a></li>
+<li><a href="https://yeasy.gitbook.io/docker_practice/compose/introduction">Docker —— 从入门到实践</a></li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%8B%E7%BB%8D">📖介绍</a></li>
+<li><a href="#%E5%AE%89%E8%A3%85">🔩安装</a>
+<ul>
+<li><a href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E6%96%B9%E5%BC%8F">二进制包方式</a></li>
+<li><a href="#docker-run-%E6%96%B9%E5%BC%8F">Docker run 方式</a></li>
+</ul>
+</li>
+<li><a href="#compose-%E6%A8%A1%E6%9D%BF%E6%96%87%E4%BB%B6">📝Compose 模板文件</a></li>
+<li><a href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4">📌常用命令</a></li>
+<li><a href="#%E5%8F%82%E8%80%83">📍参考</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/youtube-dlp-shi-yong-ji-lu-pei-he-emby-shi-yong/">
+              <h3 class="post-title">
+                Youtube-DLP 使用记录，配合 emby
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

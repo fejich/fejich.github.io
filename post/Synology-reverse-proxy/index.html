@@ -1,0 +1,222 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>群辉反代虚拟机套件noVNC窗口提示“无法连线到伺服器”的解决方法 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="群辉反代虚拟机套件noVNC窗口提示“无法连线到伺服器”的解决方法 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="🚧问题情况
+群晖 DSM 6.2.1以上版本，在使用   反向代理用域名访问虚拟机（Virtual Machine）时标题为 noVNC 的网页 提示“无法连线到伺服器”（Failed to connect to server）。
+看过之..." />
+    <meta name="keywords" content="NAS,Synology" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              群辉反代虚拟机套件noVNC窗口提示“无法连线到伺服器”的解决方法
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-08
+              </span>
+              <span>
+                1 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/nas/" class="post-tag">
+                  # NAS
+                </a>
+              
+                <a href="https://fejich.github.io/tag/synology/" class="post-tag">
+                  # Synology
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/Synology-reverse-proxy.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="问题情况">🚧问题情况</h2>
+<p>群晖 <code>DSM 6.2.1</code>以上版本，在使用   反向代理用域名访问<code>虚拟机（Virtual Machine）</code>时标题为 noVNC 的网页 提示<code>“无法连线到伺服器”（Failed to connect to server）</code>。</p>
+<p>看过之前大神的帖子让改 Portal.mustache 文件，但是在 DSM 6.2.1 及以上版本中这种改法不但不起作用，还会让 DSM 无法启动，请大家一定要注意。</p>
+<h2 id="解决办法">💡解决办法</h2>
+<p>在 控制面板-应用程序门户-反向代理服务器 中选中要访问虚拟机的那条反向代理， 编辑-“自定义标题”选项卡-“新增”的下拉箭头-WebSocket，然后随便点一下新添加的 “Upgrade”或者“Connection”标签名称，确定保存即可。每个需要访问虚拟机的反代域名都要设置一遍才行。<br>
+<img src="https://fejich.github.io/post-images/1631239017002.png" alt="" loading="lazy"></p>
+<h2 id="转载整理自">🎈转载整理自</h2>
+<p><a href="http://www.nasyun.com/thread-70881-1-1.html">解决使用反向代理域名访问群晖虚拟机时提示noVNC“无法连线到伺服器”的问题</a></p>
+<ul>
+<li>作者：<code>shenhaiyu</code> 于 2020-5-17 20:15 编辑</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E9%97%AE%E9%A2%98%E6%83%85%E5%86%B5">🚧问题情况</a></li>
+<li><a href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95">💡解决办法</a></li>
+<li><a href="#%E8%BD%AC%E8%BD%BD%E6%95%B4%E7%90%86%E8%87%AA">🎈转载整理自</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/unraid-xi-tong-xia-ding-shi-yun-xing-jiao-ben-huo-qu-bing-mei-ri-bi-zhi/">
+              <h3 class="post-title">
+                unRAID 系统下定时运行脚本获取 bing每日壁纸
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

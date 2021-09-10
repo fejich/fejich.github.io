@@ -1,0 +1,295 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>unRAID 系统下虚拟机黑群辉硬盘无损扩容记录 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="unRAID 系统下虚拟机黑群辉硬盘无损扩容记录 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="🌌测试环境
+黑群辉DSM 6.1.X，Basic 磁盘，btrfs 分区格式
+虚拟硬盘为 img 格式，原始容量 30G
+1）调整虚拟硬盘容量
+务必虚拟机关机情况下再操作
+qemu-img resize 30G.img -- +70G
+
+..." />
+    <meta name="keywords" content="unRAID,NAS,Synology" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              unRAID 系统下虚拟机黑群辉硬盘无损扩容记录
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-07
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/unraid/" class="post-tag">
+                  # unRAID
+                </a>
+              
+                <a href="https://fejich.github.io/tag/nas/" class="post-tag">
+                  # NAS
+                </a>
+              
+                <a href="https://fejich.github.io/tag/synology/" class="post-tag">
+                  # Synology
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/unraid-xi-tong-xia-xu-ni-ji-hei-qun-hui-ying-pan-wu-sun-kuo-rong-ji-lu.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="测试环境">🌌测试环境</h2>
+<p>黑群辉DSM 6.1.X，Basic 磁盘，btrfs 分区格式<br>
+虚拟硬盘为 img 格式，原始容量 30G</p>
+<h2 id="1调整虚拟硬盘容量">1）调整虚拟硬盘容量</h2>
+<p>务必虚拟机关机情况下再操作</p>
+<p><code>qemu-img resize 30G.img -- +70G</code></p>
+<blockquote>
+<p>使用 qemu-img 命令给虚拟硬盘增加 70G 容量</p>
+</blockquote>
+<h2 id="2使用-fdisk-无损扩容">2）使用 fdisk 无损扩容</h2>
+<p><code>fdisk 30G.img</code></p>
+<blockquote>
+<p>具体操作记录，注意看 #号后面的中文注解</p>
+</blockquote>
+<pre><code class="language-shell">Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): p #查看硬盘信息
+Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xed294359
+
+Device      Boot   Start      End  Sectors  Size Id Type
+vdisk2.img1         2048  4982527  4980480  2.4G fd Linux raid autodetect
+vdisk2.img2      4982528  9176831  4194304    2G fd Linux raid autodetect
+vdisk2.img3      9437184 62709759 53272576 25.4G fd Linux raid autodetect  #记录下第三分区的开始位置 9437184，后边要用到
+
+Command (m for help): d #首先删掉分区
+Partition number (1-3, default 3): 
+
+Partition 3 has been deleted.
+
+Command (m for help): n #然后新建一个，按默认选主分区跟编号即可
+Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): 
+
+Using default response p.
+Partition number (3,4, default 3): 
+First sector (9176832-209715199, default 9177088): 9437184 #这里是无损扩容的关键，必须不能填错
+Last sector, +/-sectors or +/-size{K,M,G,T,P} (9437184-209715199, default 209715199): 
+
+Created a new partition 3 of type 'Linux' and of size 95.5 GiB.
+Partition #3 contains a linux_raid_member signature.
+
+Do you want to remove the signature? [Y]es/[N]o: n # 必须选 N ，不要移除签名
+
+Command (m for help): p #再次查看信息已经看到分区是扩容状态
+
+Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xed294359
+
+Device      Boot   Start       End   Sectors  Size Id Type
+vdisk2.img1         2048   4982527   4980480  2.4G fd Linux raid autodetect
+vdisk2.img2      4982528   9176831   4194304    2G fd Linux raid autodetect
+vdisk2.img3      9437184 209715199 200278016 95.5G 83 Linux
+
+Command (m for help): w #最后按 w 保存分区表
+The partition table has been altered.
+Syncing disks.
+</code></pre>
+<h2 id="3打开虚拟机使用-存储空间管理员-扩容即可">3）打开虚拟机，使用 存储空间管理员 扩容即可</h2>
+<p>点 <code>管理</code>，按提示操作</p>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631242219179.png" alt="" loading="lazy"></figure>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83">🌌测试环境</a></li>
+<li><a href="#1%E8%B0%83%E6%95%B4%E8%99%9A%E6%8B%9F%E7%A1%AC%E7%9B%98%E5%AE%B9%E9%87%8F">1）调整虚拟硬盘容量</a></li>
+<li><a href="#2%E4%BD%BF%E7%94%A8-fdisk-%E6%97%A0%E6%8D%9F%E6%89%A9%E5%AE%B9">2）使用 fdisk 无损扩容</a></li>
+<li><a href="#3%E6%89%93%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%BD%BF%E7%94%A8-%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86%E5%91%98-%E6%89%A9%E5%AE%B9%E5%8D%B3%E5%8F%AF">3）打开虚拟机，使用 存储空间管理员 扩容即可</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/hello-gridea/">
+              <h3 class="post-title">
+                Hello Gridea
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

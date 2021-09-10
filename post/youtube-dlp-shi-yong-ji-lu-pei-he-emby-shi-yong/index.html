@@ -1,0 +1,337 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Youtube-DLP 使用记录，配合 emby | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Youtube-DLP 使用记录，配合 emby | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖简介
+yt-dlp 是 Youtube-DL 的增强版，更新维护很积极。相比起原版更为稳定，功能更完善。
+
+主页：https://github.com/yt-dlp/yt-dlp
+
+
+Win 系统直接下载 exe 即可运行，其他系统下还..." />
+    <meta name="keywords" content="emby,PC,ffmpeg,Mac,Linux" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Youtube-DLP 使用记录，配合 emby
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-10
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/emby/" class="post-tag">
+                  # emby
+                </a>
+              
+                <a href="https://fejich.github.io/tag/pc/" class="post-tag">
+                  # PC
+                </a>
+              
+                <a href="https://fejich.github.io/tag/ffmpeg/" class="post-tag">
+                  # ffmpeg
+                </a>
+              
+                <a href="https://fejich.github.io/tag/mac/" class="post-tag">
+                  # Mac
+                </a>
+              
+                <a href="https://fejich.github.io/tag/linux/" class="post-tag">
+                  # Linux
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/youtube-dlp-shi-yong-ji-lu-pei-he-emby-shi-yong.svg" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="简介">📖简介</h2>
+<p><strong>yt-dlp</strong> 是 Youtube-DL 的增强版，更新维护很积极。相比起原版更为稳定，功能更完善。</p>
+<ul>
+<li>主页：https://github.com/yt-dlp/yt-dlp</li>
+</ul>
+<blockquote>
+<p>Win 系统直接下载 exe 即可运行，其他系统下还需要系统安装有 Python3.6+ 环境。<br>
+Linux, macOS, BSD 系统均为同一个提供可执行文件</p>
+</blockquote>
+<h2 id="高级功能需要调用-ffmpeg">🤺高级功能需要调用 ffmpeg</h2>
+<p>没有 ffmpeg 情况下，能下载的文件格式有限封面图转换之类的功能也不能工作</p>
+<blockquote>
+<p>还有一些平常用不到的功能需要依赖另外的软件，具体看项目主页</p>
+</blockquote>
+<h2 id="️配置文件">⚙️配置文件</h2>
+<p>于主程序目录或者用户HOME目录下建立 <code>yt-dlp.conf</code> 文件，即会调用。<br>
+用来设置输出文件名，下载代理服务器，下载封面，下载视频简介等非常方便</p>
+<blockquote>
+<p>注意配置文件内不能有中文字符，否则会报错</p>
+</blockquote>
+<pre><code>#filename
+-o '%(title)s[%(resolution)s][%(upload_date)s].%(ext)s'
+
+# best HDR or best SDR
+#-f 'bestvideo[vcodec=vp9.2]+bestaudio/bestvideo[vcodec=vp9]+bestaudio'
+
+#only m4a
+#-f 'ba[ext=m4a]'
+#-f wa
+
+#thumbnail to jpg
+--write-thumbnail
+--convert-thumbnails jpg
+#--embed-thumbnail
+
+#proxy
+--proxy 127.0.0.1:7890
+
+#other
+--write-description
+--write-subs
+--compat-options no-live-chat
+--remux-video mkv
+
+#playlist
+#--playlist-items 1-2,11-20
+
+#--skip-download
+
+--exec 'sh /Users/fejich/Movies/Youtube/nfo.sh'
+</code></pre>
+<h2 id="视频简介转换为-emby-能识别的-nfo-文件">📝视频简介转换为 emby 能识别的 nfo 文件</h2>
+<p>用于把视频简介（description文件）转换成 emby 能识别的格式，<br>
+可保存为 sh 脚本使用 <code>--exec</code>  参数调用。</p>
+<blockquote>
+<p>适用于 Linux 与 Mac 系统</p>
+</blockquote>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631260550740.png" alt="" loading="lazy"></figure>
+<pre><code class="language-sh">#!/bin/bash
+
+# 生成临时文件
+tee nfo1.temp &lt;&lt;-'EOF'
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;movie&gt;
+  &lt;plot&gt;&lt;![CDATA[
+EOF
+
+tee nfo2.temp &lt;&lt;-'EOF'
+
+]]&gt;&lt;/plot&gt;
+&lt;/movie&gt;
+EOF
+
+# 生成 emby 可识别的 nfo 文件并添加换行符号
+file=$1
+filename=${file%.*}
+nfo=${filename}.nfo
+description=${filename}.description
+
+touch &quot;${nfo}&quot;;
+cat nfo1.temp &gt; &quot;${nfo}&quot;;
+sed 's#$#&amp;&lt;br/&gt;#g' &quot;${description}&quot; &gt;&gt; &quot;${nfo}&quot;;
+cat nfo2.temp &gt;&gt; &quot;${nfo}&quot;;
+
+# 删除临时文件
+rm nfo1.temp nfo2.temp
+</code></pre>
+<h2 id="win-系统下简单可交互-bat-脚本">🖥Win 系统下简单可交互 bat 脚本</h2>
+<p>保存为 bat 脚本，与主程序放同一个目录即可</p>
+<pre><code>@ECHO OFF&amp;PUSHD %~DP0 &amp;TITLE Youtube-DLP 下载脚本
+@ echo.
+@ echo.
+@ echo.
+@ echo.
+set /p ID= 输入 视频/播放列表网址 按回车：
+@ echo.
+@ echo.
+@ echo.
+@ echo.
+ECHO 分析下载地址......
+yt-dlp %ID%
+@ echo.
+@ echo.
+@ echo.
+@ echo.
+ECHO 下载完成，任意键退出......
+pause&gt;NUL
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E7%AE%80%E4%BB%8B">📖简介</a></li>
+<li><a href="#%E9%AB%98%E7%BA%A7%E5%8A%9F%E8%83%BD%E9%9C%80%E8%A6%81%E8%B0%83%E7%94%A8-ffmpeg">🤺高级功能需要调用 ffmpeg</a></li>
+<li><a href="#%EF%B8%8F%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">⚙️配置文件</a></li>
+<li><a href="#%E8%A7%86%E9%A2%91%E7%AE%80%E4%BB%8B%E8%BD%AC%E6%8D%A2%E4%B8%BA-emby-%E8%83%BD%E8%AF%86%E5%88%AB%E7%9A%84-nfo-%E6%96%87%E4%BB%B6">📝视频简介转换为 emby 能识别的 nfo 文件</a></li>
+<li><a href="#win-%E7%B3%BB%E7%BB%9F%E4%B8%8B%E7%AE%80%E5%8D%95%E5%8F%AF%E4%BA%A4%E4%BA%92-bat-%E8%84%9A%E6%9C%AC">🖥Win 系统下简单可交互 bat 脚本</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/tong-guo-wang-luo-huan-xing-woljiao-xing-shui-mian-zhuang-tai-zhong-de-mac/">
+              <h3 class="post-title">
+                通过网络唤醒(WOL)叫醒睡眠状态中的Mac
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

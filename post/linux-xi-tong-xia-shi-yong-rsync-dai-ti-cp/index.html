@@ -1,0 +1,251 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Linux 系统下使用 rsync 代替 cp | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Linux 系统下使用 rsync 代替 cp | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖前言
+rsync 是一个常用的 Linux 应用程序，用于文件同步。
+它可以在本地计算机与远程计算机之间，或者两个本地目录之间同步文件。它也可以当作文件复制工具，替代 cp 和 mv 命令。
+⚙️实际操作
+显示单个文件进度，保留文件的权..." />
+    <meta name="keywords" content="Linux" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Linux 系统下使用 rsync 代替 cp
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-07
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/linux/" class="post-tag">
+                  # Linux
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/linux-xi-tong-xia-shi-yong-rsync-dai-ti-cp.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">📖前言</h2>
+<p><code>rsync</code> 是一个常用的 Linux 应用程序，用于文件同步。</p>
+<p>它可以在本地计算机与远程计算机之间，或者两个本地目录之间同步文件。它也可以当作文件复制工具，替代 <code>cp</code> 和 <code>mv</code> 命令。</p>
+<h2 id="️实际操作">⚙️实际操作</h2>
+<h3 id="显示单个文件进度保留文件的权限">显示单个文件进度，保留文件的权限</h3>
+<pre><code class="language-shell">rsync -ah --progress /source /destination
+</code></pre>
+<h3 id="显示总体进度保留文件的权限">显示总体进度，保留文件的权限</h3>
+<pre><code class="language-shell">rsync -ah --info=progress2 --no-i-r /source/ /destination
+</code></pre>
+<blockquote>
+<p>目标目录destination如果不存在，rsync 会自动创建。执行上面的命令后，源目录source被完整地复制到了目标目录destination下面，即形成了destination/source的目录结构。</p>
+</blockquote>
+<blockquote>
+<blockquote>
+<p>如果只想同步源目录source里面的内容到目标目录destination，则需要在源目录后面加上斜杠 / 。</p>
+</blockquote>
+</blockquote>
+<h3 id="文件夹镜像">文件夹镜像</h3>
+<pre><code>rsync -ah --info=progress2 --no-i-r --delete /source/ /destination
+</code></pre>
+<h3 id="设置为命令别名方便调用">设置为命令别名，方便调用</h3>
+<pre><code>alias cp=&quot;rsync -ah --progress&quot;
+alias rcp=&quot;rsync -ah --info=progress2 --no-i-r&quot;
+</code></pre>
+<h3 id="rsync-常用选项">rsync 常用选项：</h3>
+<p><code>-a</code> 递归传输并保持所有文件属性，最常用</p>
+<p><code>-h</code> 以人类可读的格式输出</p>
+<p><code>-v</code> 详细模式输出</p>
+<p><code>-z</code> 文件在传输时进行压缩处理</p>
+<p><code>--delete</code> 删除只存在于目标目录、不存在于源目标的文件，即保证目标目录是源目标的镜像。</p>
+<hr>
+<h2 id="参考">🎈参考</h2>
+<p><a href="http://www.ruanyifeng.com/blog/2020/08/rsync.html">rsync 用法教程</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">📖前言</a></li>
+<li><a href="#%EF%B8%8F%E5%AE%9E%E9%99%85%E6%93%8D%E4%BD%9C">⚙️实际操作</a>
+<ul>
+<li><a href="#%E6%98%BE%E7%A4%BA%E5%8D%95%E4%B8%AA%E6%96%87%E4%BB%B6%E8%BF%9B%E5%BA%A6%E4%BF%9D%E7%95%99%E6%96%87%E4%BB%B6%E7%9A%84%E6%9D%83%E9%99%90">显示单个文件进度，保留文件的权限</a></li>
+<li><a href="#%E6%98%BE%E7%A4%BA%E6%80%BB%E4%BD%93%E8%BF%9B%E5%BA%A6%E4%BF%9D%E7%95%99%E6%96%87%E4%BB%B6%E7%9A%84%E6%9D%83%E9%99%90">显示总体进度，保留文件的权限</a></li>
+<li><a href="#%E6%96%87%E4%BB%B6%E5%A4%B9%E9%95%9C%E5%83%8F">文件夹镜像</a></li>
+<li><a href="#%E8%AE%BE%E7%BD%AE%E4%B8%BA%E5%91%BD%E4%BB%A4%E5%88%AB%E5%90%8D%E6%96%B9%E4%BE%BF%E8%B0%83%E7%94%A8">设置为命令别名，方便调用</a></li>
+<li><a href="#rsync-%E5%B8%B8%E7%94%A8%E9%80%89%E9%A1%B9">rsync 常用选项：</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83">🎈参考</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/unraid-xi-tong-xia-xu-ni-ji-hei-qun-hui-ying-pan-wu-sun-kuo-rong-ji-lu/">
+              <h3 class="post-title">
+                unRAID 系统下虚拟机黑群辉硬盘无损扩容记录
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

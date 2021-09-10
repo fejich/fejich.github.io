@@ -1,0 +1,245 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>导出视频内嵌字幕文件的两个方法 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="导出视频内嵌字幕文件的两个方法 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖前言
+一切起因是发现了 emby 这个媒体中心软件有个 “bug”
+内嵌了 .ass字幕 的视频如果是 directplay 方式（直接播放）字幕能正确显示，
+但是一旦触发了转码，字幕就得隔一分钟左右才能显示出来。
+而造成这么慢的原因，..." />
+    <meta name="keywords" content="ffmpeg,Mac,Linux" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              导出视频内嵌字幕文件的两个方法
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-08
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/ffmpeg/" class="post-tag">
+                  # ffmpeg
+                </a>
+              
+                <a href="https://fejich.github.io/tag/mac/" class="post-tag">
+                  # Mac
+                </a>
+              
+                <a href="https://fejich.github.io/tag/linux/" class="post-tag">
+                  # Linux
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">📖前言</h2>
+<p>一切起因是发现了 emby 这个媒体中心软件有个 “bug”</p>
+<p>内嵌了 .ass字幕 的视频如果是 directplay 方式（直接播放）字幕能正确显示，</p>
+<p>但是一旦触发了转码，字幕就得隔一分钟左右才能显示出来。</p>
+<p>而造成这么慢的原因，是因为实时导出字幕这个操作比较耗时（目前我尝试过好几个软件都得实现不了秒出）</p>
+<p>直接外挂的字幕就没这种烦恼，所以有了这个文章。</p>
+<h2 id="方法1-使用-mkvtoolnix-工具包">💡方法1 使用 mkvtoolnix 工具包</h2>
+<p>Mac 系统安装：<code>brew install mkvtoolnix</code></p>
+<p>查看文件信息：<code>mkvmerge -i test.mkv</code></p>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631241923771.png" alt="" loading="lazy"></figure>
+<p>可以看到 4 跟 5 是 ass 字幕</p>
+<p>导出命令：<code>mkvextract tracks test.mkv 4:sub1.ass 5:sub2.ass</code></p>
+<p>批量操作脚本</p>
+<pre><code class="language-sh">for file in *.mkv; do
+    filename=${file%.*}
+    mkvextract tracks &quot;${file}&quot; 4:&quot;${filename}.map4.ass&quot; 4:&quot;${filename}.map5.ass&quot;
+done
+</code></pre>
+<h2 id="方法2-使用-ffmpeg">💡方法2 使用 ffmpeg</h2>
+<p>查看文件信息：<code>ffmpeg -i test.mkv</code></p>
+<p>导出字幕：<code>ffmpeg -i test.mkv -map 0:5 sub.ass</code></p>
+<blockquote>
+<p>ffmpeg 还可以给字幕转格式，例如 ass 转 srt。只要指定输出的格式就会自动处理</p>
+</blockquote>
+<p>批量操作脚本</p>
+<pre><code class="language-sh">for file in *.mkv; do
+    filename=${file%.*}
+    ffmpeg -i &quot;${file}&quot; -map 0:2 &quot;${filename}.map2.ass&quot; -map 0:3 &quot;${filename}.map3.ass&quot; -map 0:4 &quot;${filename}.map4.ass&quot; -map 0:5 &quot;${filename}.map5.ass&quot;
+done
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">📖前言</a></li>
+<li><a href="#%E6%96%B9%E6%B3%951-%E4%BD%BF%E7%94%A8-mkvtoolnix-%E5%B7%A5%E5%85%B7%E5%8C%85">💡方法1 使用 mkvtoolnix 工具包</a></li>
+<li><a href="#%E6%96%B9%E6%B3%952-%E4%BD%BF%E7%94%A8-ffmpeg">💡方法2 使用 ffmpeg</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/ssh-mian-mi-deng-lu-openwrt-lu-you-qi-bing-zhi-xing-ming-ling/">
+              <h3 class="post-title">
+                SSH免密登录OpenWRT路由器并执行命令
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

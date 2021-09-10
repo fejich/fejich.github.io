@@ -1,0 +1,241 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SSH免密登录OpenWRT路由器并执行命令 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631274875056">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="SSH免密登录OpenWRT路由器并执行命令 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📖前言
+Dropbear是一款基于ssh协议的轻量sshd服务器，与OpenSSH相比，他更简洁，更小巧，运行起来占用的内存也更少。
+每一个普通用户登录，OpenSSH会开两个sshd进程，而dropbear只开一个进程，所以其对硬件要求..." />
+    <meta name="keywords" content="Linux,OpenWRT" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1631274875056" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              SSH免密登录OpenWRT路由器并执行命令
+            </h2>
+            <div class="post-info">
+              <span>
+                2021-09-07
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/linux/" class="post-tag">
+                  # Linux
+                </a>
+              
+                <a href="https://fejich.github.io/tag/openwrt/" class="post-tag">
+                  # OpenWRT
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/ssh-mian-mi-deng-lu-openwrt-lu-you-qi-bing-zhi-xing-ming-ling.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="前言">📖前言</h2>
+<p><code>Dropbear</code>是一款基于ssh协议的轻量sshd服务器，与OpenSSH相比，他更简洁，更小巧，运行起来占用的内存也更少。</p>
+<p>每一个普通用户登录，OpenSSH会开两个sshd进程，而dropbear只开一个进程，所以其对硬件要求更低，也更利于系统的运行。</p>
+<p>Dropbear常用于“嵌入”式的Linux（或其他Unix）系统，<strong>OpenWRT 路由系统就是其中之一</strong></p>
+<h2 id="️实际操作">⚙️实际操作</h2>
+<h3 id="1配置-ssh-密钥">1）配置 ssh 密钥</h3>
+<p><code>ssh-keygen -t rsa</code></p>
+<blockquote>
+<p>连续三次回车,即在本地主机上生成了公钥和私钥,不设置密码</p>
+</blockquote>
+<p><code>cat ~/.ssh/id_rsa.pub | ssh -p 22 root@192.168.168.1 'cat &gt;&gt; /etc/dropbear/authorized_keys'</code></p>
+<blockquote>
+<p>将本地密钥写入到路由信任列表内</p>
+</blockquote>
+<h3 id="2测试免密登录路由器并执行命令">2）测试免密登录路由器并执行命令</h3>
+<p><code>ssh -p 22 root@192.168.168.1 &quot;touch /root/test ; ls&quot;</code></p>
+<h3 id="3配置-crontab-定时执行命令">3）配置 crontab 定时执行命令</h3>
+<p><code>crontab -e</code></p>
+<pre><code class="language-bash">#凌晨4点重启路由+5点进行时间同步
+0 4 * * * ssh -p 22 root@192.168.168.1 &quot;reboot&quot;
+0 5 * * * ssh -p 22 root@192.168.168.1 &quot;ntpd -n -q -p ntp.aliyun.com&quot;
+</code></pre>
+<h2 id="参考">🎈参考</h2>
+<p><a href="https://www.jqhtml.com/61355.html">极路由上的dropbear</a></p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">📖前言</a></li>
+<li><a href="#%EF%B8%8F%E5%AE%9E%E9%99%85%E6%93%8D%E4%BD%9C">⚙️实际操作</a>
+<ul>
+<li><a href="#1%E9%85%8D%E7%BD%AE-ssh-%E5%AF%86%E9%92%A5">1）配置 ssh 密钥</a></li>
+<li><a href="#2%E6%B5%8B%E8%AF%95%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E8%B7%AF%E7%94%B1%E5%99%A8%E5%B9%B6%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4">2）测试免密登录路由器并执行命令</a></li>
+<li><a href="#3%E9%85%8D%E7%BD%AE-crontab-%E5%AE%9A%E6%97%B6%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4">3）配置 crontab 定时执行命令</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8F%82%E8%80%83">🎈参考</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/linux-xi-tong-xia-shi-yong-rsync-dai-ti-cp/">
+              <h3 class="post-title">
+                Linux 系统下使用 rsync 代替 cp
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>
