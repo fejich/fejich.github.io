@@ -2,23 +2,20 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>unRAID 系统下虚拟机黑群辉硬盘无损扩容记录 | 瞎折腾分享</title>
+<title>适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动） | 瞎折腾分享</title>
 <link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1631529704822">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="unRAID 系统下虚拟机黑群辉硬盘无损扩容记录 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动） | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="🌌测试环境
-黑群辉DSM 6.1.X，Basic 磁盘，btrfs 分区格式
-虚拟硬盘为 img 格式，原始容量 30G
-1）调整虚拟硬盘容量
-务必虚拟机关机情况下再操作
-qemu-img resize 30G.img -- +70G
+    <meta name="description" content="📖说明
+DSM 6.2.2 24922 DS918+ 引导（集成 Virtio 驱动）
 
-..." />
+注意：本引导只支持Proxmox VE，unRAID 等 KVM 内核虚拟机
+不支持ESXi和裸机，DSM版本只支持6.2.2 24922，其他版本..." />
     <meta name="keywords" content="unRAID,NAS,Synology" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
@@ -81,11 +78,11 @@ qemu-img resize 30G.img -- +70G
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              unRAID 系统下虚拟机黑群辉硬盘无损扩容记录
+              适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动）
             </h2>
             <div class="post-info">
               <span>
-                2021-09-07
+                2021-09-13
               </span>
               <span>
                 3 min read
@@ -105,94 +102,80 @@ qemu-img resize 30G.img -- +70G
               
             </div>
             
-              <img class="post-feature-image" src="https://fejich.github.io/post-images/unraid-xi-tong-xia-xu-ni-ji-hei-qun-hui-ying-pan-wu-sun-kuo-rong-ji-lu.png" alt="">
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/gua-he-kvm-nei-he-xu-ni-ji-shi-yong-de-hei-qun-hui-ds918yin-dao-ji-cheng-virtio-qu-dong.png" alt="">
             
             <div class="post-content-wrapper">
               <div class="post-content">
-                <h2 id="测试环境">🌌测试环境</h2>
-<p>黑群辉DSM 6.1.X，Basic 磁盘，btrfs 分区格式<br>
-虚拟硬盘为 img 格式，原始容量 30G</p>
-<h2 id="1调整虚拟硬盘容量">1）调整虚拟硬盘容量</h2>
-<p>务必虚拟机关机情况下再操作</p>
-<p><code>qemu-img resize 30G.img -- +70G</code></p>
+                <h2 id="说明">📖说明</h2>
+<p><strong>DSM 6.2.2 24922 DS918+ 引导（集成 Virtio 驱动）</strong></p>
 <blockquote>
-<p>使用 qemu-img 命令给虚拟硬盘增加 70G 容量</p>
+<p>注意：本引导只支持Proxmox VE，unRAID 等 <strong>KVM 内核虚拟机</strong><br>
+不支持ESXi和裸机，DSM版本只支持<code>6.2.2 24922</code>，其他版本全部不支持</p>
 </blockquote>
-<h2 id="2使用-fdisk-无损扩容">2）使用 fdisk 无损扩容</h2>
-<p><code>fdisk 30G.img</code></p>
-<blockquote>
-<p>具体操作记录，注意看 #号后面的中文注解</p>
-</blockquote>
-<pre><code class="language-shell">Welcome to fdisk (util-linux 2.34).
-Changes will remain in memory only, until you decide to write them.
-Be careful before using the write command.
-
-
-Command (m for help): p #查看硬盘信息
-Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0xed294359
-
-Device      Boot   Start      End  Sectors  Size Id Type
-vdisk2.img1         2048  4982527  4980480  2.4G fd Linux raid autodetect
-vdisk2.img2      4982528  9176831  4194304    2G fd Linux raid autodetect
-vdisk2.img3      9437184 62709759 53272576 25.4G fd Linux raid autodetect  #记录下第三分区的开始位置 9437184，后边要用到
-
-Command (m for help): d #首先删掉分区
-Partition number (1-3, default 3): 
-
-Partition 3 has been deleted.
-
-Command (m for help): n #然后新建一个，按默认选主分区跟编号即可
-Partition type
-   p   primary (2 primary, 0 extended, 2 free)
-   e   extended (container for logical partitions)
-Select (default p): 
-
-Using default response p.
-Partition number (3,4, default 3): 
-First sector (9176832-209715199, default 9177088): 9437184 #这里是无损扩容的关键，必须不能填错
-Last sector, +/-sectors or +/-size{K,M,G,T,P} (9437184-209715199, default 209715199): 
-
-Created a new partition 3 of type 'Linux' and of size 95.5 GiB.
-Partition #3 contains a linux_raid_member signature.
-
-Do you want to remove the signature? [Y]es/[N]o: n # 必须选 N ，不要移除签名
-
-Command (m for help): p #再次查看信息已经看到分区是扩容状态
-
-Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0xed294359
-
-Device      Boot   Start       End   Sectors  Size Id Type
-vdisk2.img1         2048   4982527   4980480  2.4G fd Linux raid autodetect
-vdisk2.img2      4982528   9176831   4194304    2G fd Linux raid autodetect
-vdisk2.img3      9437184 209715199 200278016 95.5G 83 Linux
-
-Command (m for help): w #最后按 w 保存分区表
-The partition table has been altered.
-Syncing disks.
+<h2 id="下载地址">📥下载地址</h2>
+<h3 id="引导文件">引导文件</h3>
+<ul>
+<li>度盘：https://pan.baidu.com/s/1urA4H92nyNRz2LVlOEw60A  提取码: adgm</li>
+<li>直链：https://f-ever.cn/files/synoboot_dsm_ds918_24922_pve.zip</li>
+</ul>
+<h3 id="pat文件">PAT文件</h3>
+<p>目录：https://archive.synology.com/download/Os/DSM/6.2.2-24922<br>
+直链：https://global.download.synology.com/download/DSM/release/6.2.2/24922/DSM_DS918%2B_24922.pat</p>
+<h2 id="️unraid-虚拟机安装说明">⚙️unRAID 虚拟机安装说明</h2>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631526617423.png" alt="" loading="lazy"></figure>
+<p>注意：</p>
+<ul>
+<li>机器类型推荐选 <code>i400-fx</code> （选 Q35 情况下，系统会把第一块数据盘识别到2号盘位）</li>
+<li>引导盘选 <code>USB 总线</code></li>
+<li>数据盘选 <code>SCSI 总线</code></li>
+<li>网卡保持默认<br>
+按以上选项使用 半虚拟化VirtIO硬件 实现性能最优化</li>
+</ul>
+<h2 id="其他选项">🔩其他选项</h2>
+<h3 id="通过-virsh-console-连接到黑裙系统串口终端">通过 virsh console 连接到黑裙系统串口终端</h3>
+<pre><code>virsh console {虚拟机名}
 </code></pre>
-<h2 id="3打开虚拟机使用-存储空间管理员-扩容即可">3）打开虚拟机，使用 存储空间管理员 扩容即可</h2>
-<p>点 <code>管理</code>，按提示操作</p>
-<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631242219179.png" alt="" loading="lazy"></figure>
+<p>可以用来观察引导的启动情况，未安装pat文件前默认用户名为：root 密码为空</p>
+<h3 id="挂载宿主机文件夹virtfs">挂载宿主机文件夹(VirtFS)</h3>
+<blockquote>
+<p>VirtFS 是基于QEMU、KVM、VirtIO技术和9P2000.L协议实现的，由VirtFSServer和VirtFSClient两部分组成。通过VirtFSServer分享在宿主机上指定的文件目录，虚拟机系统使用mount指令通过9P2000.L协议挂载VirtFS，虚拟机用户使用VirtFS获取如同使用本地文件一般的IO性能。</p>
+</blockquote>
+<p>首先在编辑虚拟机设置，配置好 <code>Unraid 共享</code> 跟 <code>Unraid 挂载标签</code><br>
+黑群系统启动后于终端输入命令即可挂载宿主机文件夹</p>
+<pre><code>sudo mount -t 9p -o trans=virtio unRAID /volume1/test
+</code></pre>
+<p>比较可惜的是群晖的 FileStation 套件只能对这种方式挂载的文件进行：<code>读取、删除、重命名</code>，无法进行<code>新增文件、移动文件</code><br>
+其他第一方套件也有类似情况</p>
+<h3 id="挂载引导分区">挂载引导分区</h3>
+<p>用于修改引导分区内文件的（编辑序列号洗白，修改硬盘盘位顺序等）</p>
+<pre><code>sudo -i
+cd /dev
+mount -t vfat synoboot1 /volume1/test
+</code></pre>
+<h2 id="来源">📍来源</h2>
+<p>http://www.nasyun.com/thread-71576-1-1.html</p>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li><a href="#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83">🌌测试环境</a></li>
-<li><a href="#1%E8%B0%83%E6%95%B4%E8%99%9A%E6%8B%9F%E7%A1%AC%E7%9B%98%E5%AE%B9%E9%87%8F">1）调整虚拟硬盘容量</a></li>
-<li><a href="#2%E4%BD%BF%E7%94%A8-fdisk-%E6%97%A0%E6%8D%9F%E6%89%A9%E5%AE%B9">2）使用 fdisk 无损扩容</a></li>
-<li><a href="#3%E6%89%93%E5%BC%80%E8%99%9A%E6%8B%9F%E6%9C%BA%E4%BD%BF%E7%94%A8-%E5%AD%98%E5%82%A8%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86%E5%91%98-%E6%89%A9%E5%AE%B9%E5%8D%B3%E5%8F%AF">3）打开虚拟机，使用 存储空间管理员 扩容即可</a></li>
+<li><a href="#%E8%AF%B4%E6%98%8E">📖说明</a></li>
+<li><a href="#%E4%B8%8B%E8%BD%BD%E5%9C%B0%E5%9D%80">📥下载地址</a>
+<ul>
+<li><a href="#%E5%BC%95%E5%AF%BC%E6%96%87%E4%BB%B6">引导文件</a></li>
+<li><a href="#pat%E6%96%87%E4%BB%B6">PAT文件</a></li>
+</ul>
+</li>
+<li><a href="#%EF%B8%8Funraid-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%AE%89%E8%A3%85%E8%AF%B4%E6%98%8E">⚙️unRAID 虚拟机安装说明</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96%E9%80%89%E9%A1%B9">🔩其他选项</a>
+<ul>
+<li><a href="#%E9%80%9A%E8%BF%87-virsh-console-%E8%BF%9E%E6%8E%A5%E5%88%B0%E9%BB%91%E8%A3%99%E7%B3%BB%E7%BB%9F%E4%B8%B2%E5%8F%A3%E7%BB%88%E7%AB%AF">通过 virsh console 连接到黑裙系统串口终端</a></li>
+<li><a href="#%E6%8C%82%E8%BD%BD%E5%AE%BF%E4%B8%BB%E6%9C%BA%E6%96%87%E4%BB%B6%E5%A4%B9virtfs">挂载宿主机文件夹(VirtFS)</a></li>
+<li><a href="#%E6%8C%82%E8%BD%BD%E5%BC%95%E5%AF%BC%E5%88%86%E5%8C%BA">挂载引导分区</a></li>
+</ul>
+</li>
+<li><a href="#%E6%9D%A5%E6%BA%90">📍来源</a></li>
 </ul>
 </li>
 </ul>
@@ -205,9 +188,9 @@ Syncing disks.
         
           <div class="next-post">
             <div class="next">下一篇</div>
-            <a href="https://fejich.github.io/post/hello-gridea/">
+            <a href="https://fejich.github.io/post/mac-sheng-ji-xi-tong-hou-zi-dong-cao-zuo-app-ti-shi-dai-ma-qian-ming-chu-cuo-de-wen-ti/">
               <h3 class="post-title">
-                Hello Gridea
+                Mac 升级系统后，自动操作app 提示“代码签名出错”的问题
               </h3>
             </a>
           </div>

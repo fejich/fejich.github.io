@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fejich.github.io</id>
     <title>瞎折腾分享</title>
-    <updated>2021-09-13T09:40:49.043Z</updated>
+    <updated>2021-09-13T10:41:48.854Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fejich.github.io"/>
     <link rel="self" href="https://fejich.github.io/atom.xml"/>
@@ -10,6 +10,62 @@
     <logo>https://fejich.github.io/images/avatar.png</logo>
     <icon>https://fejich.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 瞎折腾分享</rights>
+    <entry>
+        <title type="html"><![CDATA[适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动）]]></title>
+        <id>https://fejich.github.io/post/gua-he-kvm-nei-he-xu-ni-ji-shi-yong-de-hei-qun-hui-ds918yin-dao-ji-cheng-virtio-qu-dong/</id>
+        <link href="https://fejich.github.io/post/gua-he-kvm-nei-he-xu-ni-ji-shi-yong-de-hei-qun-hui-ds918yin-dao-ji-cheng-virtio-qu-dong/">
+        </link>
+        <updated>2021-09-13T09:47:36.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="说明">📖说明</h2>
+<p><strong>DSM 6.2.2 24922 DS918+ 引导（集成 Virtio 驱动）</strong></p>
+<blockquote>
+<p>注意：本引导只支持Proxmox VE，unRAID 等 <strong>KVM 内核虚拟机</strong><br>
+不支持ESXi和裸机，DSM版本只支持<code>6.2.2 24922</code>，其他版本全部不支持</p>
+</blockquote>
+<h2 id="下载地址">📥下载地址</h2>
+<h3 id="引导文件">引导文件</h3>
+<ul>
+<li>度盘：https://pan.baidu.com/s/1urA4H92nyNRz2LVlOEw60A  提取码: adgm</li>
+<li>直链：https://f-ever.cn/files/synoboot_dsm_ds918_24922_pve.zip</li>
+</ul>
+<h3 id="pat文件">PAT文件</h3>
+<p>目录：https://archive.synology.com/download/Os/DSM/6.2.2-24922<br>
+直链：https://global.download.synology.com/download/DSM/release/6.2.2/24922/DSM_DS918%2B_24922.pat</p>
+<h2 id="️unraid-虚拟机安装说明">⚙️unRAID 虚拟机安装说明</h2>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631526617423.png" alt="" loading="lazy"></figure>
+<p>注意：</p>
+<ul>
+<li>机器类型推荐选 <code>i400-fx</code> （选 Q35 情况下，系统会把第一块数据盘识别到2号盘位）</li>
+<li>引导盘选 <code>USB 总线</code></li>
+<li>数据盘选 <code>SCSI 总线</code></li>
+<li>网卡保持默认<br>
+按以上选项使用 半虚拟化VirtIO硬件 实现性能最优化</li>
+</ul>
+<h2 id="其他选项">🔩其他选项</h2>
+<h3 id="通过-virsh-console-连接到黑裙系统串口终端">通过 virsh console 连接到黑裙系统串口终端</h3>
+<pre><code>virsh console {虚拟机名}
+</code></pre>
+<p>可以用来观察引导的启动情况，未安装pat文件前默认用户名为：root 密码为空</p>
+<h3 id="挂载宿主机文件夹virtfs">挂载宿主机文件夹(VirtFS)</h3>
+<blockquote>
+<p>VirtFS 是基于QEMU、KVM、VirtIO技术和9P2000.L协议实现的，由VirtFSServer和VirtFSClient两部分组成。通过VirtFSServer分享在宿主机上指定的文件目录，虚拟机系统使用mount指令通过9P2000.L协议挂载VirtFS，虚拟机用户使用VirtFS获取如同使用本地文件一般的IO性能。</p>
+</blockquote>
+<p>首先在编辑虚拟机设置，配置好 <code>Unraid 共享</code> 跟 <code>Unraid 挂载标签</code><br>
+黑群系统启动后于终端输入命令即可挂载宿主机文件夹</p>
+<pre><code>sudo mount -t 9p -o trans=virtio unRAID /volume1/test
+</code></pre>
+<p>比较可惜的是群晖的 FileStation 套件只能对这种方式挂载的文件进行：<code>读取、删除、重命名</code>，无法进行<code>新增文件、移动文件</code><br>
+其他第一方套件也有类似情况</p>
+<h3 id="挂载引导分区">挂载引导分区</h3>
+<p>用于修改引导分区内文件的（编辑序列号洗白，修改硬盘盘位顺序等）</p>
+<pre><code>sudo -i
+cd /dev
+mount -t vfat synoboot1 /volume1/test
+</code></pre>
+<h2 id="来源">📍来源</h2>
+<p>http://www.nasyun.com/thread-71576-1-1.html</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mac 升级系统后，自动操作app 提示“代码签名出错”的问题]]></title>
         <id>https://fejich.github.io/post/mac-sheng-ji-xi-tong-hou-zi-dong-cao-zuo-app-ti-shi-dai-ma-qian-ming-chu-cuo-de-wen-ti/</id>
@@ -482,48 +538,6 @@ done
 </code></pre>
 <h2 id="参考">🎈参考</h2>
 <p><a href="https://www.jqhtml.com/61355.html">极路由上的dropbear</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Linux 系统下使用 rsync 代替 cp]]></title>
-        <id>https://fejich.github.io/post/linux-xi-tong-xia-shi-yong-rsync-dai-ti-cp/</id>
-        <link href="https://fejich.github.io/post/linux-xi-tong-xia-shi-yong-rsync-dai-ti-cp/">
-        </link>
-        <updated>2021-09-07T08:50:22.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="前言">📖前言</h2>
-<p><code>rsync</code> 是一个常用的 Linux 应用程序，用于文件同步。</p>
-<p>它可以在本地计算机与远程计算机之间，或者两个本地目录之间同步文件。它也可以当作文件复制工具，替代 <code>cp</code> 和 <code>mv</code> 命令。</p>
-<h2 id="️实际操作">⚙️实际操作</h2>
-<h3 id="显示单个文件进度保留文件的权限">显示单个文件进度，保留文件的权限</h3>
-<pre><code class="language-shell">rsync -ah --progress /source /destination
-</code></pre>
-<h3 id="显示总体进度保留文件的权限">显示总体进度，保留文件的权限</h3>
-<pre><code class="language-shell">rsync -ah --info=progress2 --no-i-r /source/ /destination
-</code></pre>
-<blockquote>
-<p>目标目录destination如果不存在，rsync 会自动创建。执行上面的命令后，源目录source被完整地复制到了目标目录destination下面，即形成了destination/source的目录结构。</p>
-</blockquote>
-<blockquote>
-<blockquote>
-<p>如果只想同步源目录source里面的内容到目标目录destination，则需要在源目录后面加上斜杠 / 。</p>
-</blockquote>
-</blockquote>
-<h3 id="文件夹镜像">文件夹镜像</h3>
-<pre><code>rsync -ah --info=progress2 --no-i-r --delete /source/ /destination
-</code></pre>
-<h3 id="设置为命令别名方便调用">设置为命令别名，方便调用</h3>
-<pre><code>alias cp=&quot;rsync -ah --progress&quot;
-alias rcp=&quot;rsync -ah --info=progress2 --no-i-r&quot;
-</code></pre>
-<h3 id="rsync-常用选项">rsync 常用选项：</h3>
-<p><code>-a</code> 递归传输并保持所有文件属性，最常用</p>
-<p><code>-h</code> 以人类可读的格式输出</p>
-<p><code>-v</code> 详细模式输出</p>
-<p><code>-z</code> 文件在传输时进行压缩处理</p>
-<p><code>--delete</code> 删除只存在于目标目录、不存在于源目标的文件，即保证目标目录是源目标的镜像。</p>
-<hr>
-<h2 id="参考">🎈参考</h2>
-<p><a href="http://www.ruanyifeng.com/blog/2020/08/rsync.html">rsync 用法教程</a></p>
 ]]></content>
     </entry>
 </feed>
