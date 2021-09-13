@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fejich.github.io</id>
     <title>瞎折腾分享</title>
-    <updated>2021-09-10T11:55:11.537Z</updated>
+    <updated>2021-09-13T09:40:49.043Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fejich.github.io"/>
     <link rel="self" href="https://fejich.github.io/atom.xml"/>
@@ -10,6 +10,30 @@
     <logo>https://fejich.github.io/images/avatar.png</logo>
     <icon>https://fejich.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, 瞎折腾分享</rights>
+    <entry>
+        <title type="html"><![CDATA[Mac 升级系统后，自动操作app 提示“代码签名出错”的问题]]></title>
+        <id>https://fejich.github.io/post/mac-sheng-ji-xi-tong-hou-zi-dong-cao-zuo-app-ti-shi-dai-ma-qian-ming-chu-cuo-de-wen-ti/</id>
+        <link href="https://fejich.github.io/post/mac-sheng-ji-xi-tong-hou-zi-dong-cao-zuo-app-ti-shi-dai-ma-qian-ming-chu-cuo-de-wen-ti/">
+        </link>
+        <updated>2021-09-13T09:30:53.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="️症状">⚠️症状</h2>
+<p>无论是使用 自动操作app 修改还是新建程序都会提示： “代码签名出错”</p>
+<h2 id="解决方法">💡解决方法</h2>
+<ul>
+<li>终端运行以下命令</li>
+</ul>
+<pre><code>xcode-select --install
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631525661202.png" alt="" loading="lazy"></figure>
+<ul>
+<li>如果没有解决问题，执行以下命令</li>
+</ul>
+<pre><code>sudo xcode-select -switch /
+</code></pre>
+<h2 id="来源">来源</h2>
+<p><a href="https://www.jianshu.com/p/50b6771eb853">解决MacOS升级后出现xcrun: error: invalid active developer path, missing xcrun的问题</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Docker Compose 简单使用手册]]></title>
         <id>https://fejich.github.io/post/docker-compose-jian-dan-shi-yong-shou-ce/</id>
@@ -500,88 +524,6 @@ alias rcp=&quot;rsync -ah --info=progress2 --no-i-r&quot;
 <hr>
 <h2 id="参考">🎈参考</h2>
 <p><a href="http://www.ruanyifeng.com/blog/2020/08/rsync.html">rsync 用法教程</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[unRAID 系统下虚拟机黑群辉硬盘无损扩容记录]]></title>
-        <id>https://fejich.github.io/post/unraid-xi-tong-xia-xu-ni-ji-hei-qun-hui-ying-pan-wu-sun-kuo-rong-ji-lu/</id>
-        <link href="https://fejich.github.io/post/unraid-xi-tong-xia-xu-ni-ji-hei-qun-hui-ying-pan-wu-sun-kuo-rong-ji-lu/">
-        </link>
-        <updated>2021-09-07T07:47:33.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="测试环境">🌌测试环境</h2>
-<p>黑群辉DSM 6.1.X，Basic 磁盘，btrfs 分区格式<br>
-虚拟硬盘为 img 格式，原始容量 30G</p>
-<h2 id="1调整虚拟硬盘容量">1）调整虚拟硬盘容量</h2>
-<p>务必虚拟机关机情况下再操作</p>
-<p><code>qemu-img resize 30G.img -- +70G</code></p>
-<blockquote>
-<p>使用 qemu-img 命令给虚拟硬盘增加 70G 容量</p>
-</blockquote>
-<h2 id="2使用-fdisk-无损扩容">2）使用 fdisk 无损扩容</h2>
-<p><code>fdisk 30G.img</code></p>
-<blockquote>
-<p>具体操作记录，注意看 #号后面的中文注解</p>
-</blockquote>
-<pre><code class="language-shell">Welcome to fdisk (util-linux 2.34).
-Changes will remain in memory only, until you decide to write them.
-Be careful before using the write command.
-
-
-Command (m for help): p #查看硬盘信息
-Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0xed294359
-
-Device      Boot   Start      End  Sectors  Size Id Type
-vdisk2.img1         2048  4982527  4980480  2.4G fd Linux raid autodetect
-vdisk2.img2      4982528  9176831  4194304    2G fd Linux raid autodetect
-vdisk2.img3      9437184 62709759 53272576 25.4G fd Linux raid autodetect  #记录下第三分区的开始位置 9437184，后边要用到
-
-Command (m for help): d #首先删掉分区
-Partition number (1-3, default 3): 
-
-Partition 3 has been deleted.
-
-Command (m for help): n #然后新建一个，按默认选主分区跟编号即可
-Partition type
-   p   primary (2 primary, 0 extended, 2 free)
-   e   extended (container for logical partitions)
-Select (default p): 
-
-Using default response p.
-Partition number (3,4, default 3): 
-First sector (9176832-209715199, default 9177088): 9437184 #这里是无损扩容的关键，必须不能填错
-Last sector, +/-sectors or +/-size{K,M,G,T,P} (9437184-209715199, default 209715199): 
-
-Created a new partition 3 of type 'Linux' and of size 95.5 GiB.
-Partition #3 contains a linux_raid_member signature.
-
-Do you want to remove the signature? [Y]es/[N]o: n # 必须选 N ，不要移除签名
-
-Command (m for help): p #再次查看信息已经看到分区是扩容状态
-
-Disk vdisk2.img: 100 GiB, 107374182400 bytes, 209715200 sectors
-Units: sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disklabel type: dos
-Disk identifier: 0xed294359
-
-Device      Boot   Start       End   Sectors  Size Id Type
-vdisk2.img1         2048   4982527   4980480  2.4G fd Linux raid autodetect
-vdisk2.img2      4982528   9176831   4194304    2G fd Linux raid autodetect
-vdisk2.img3      9437184 209715199 200278016 95.5G 83 Linux
-
-Command (m for help): w #最后按 w 保存分区表
-The partition table has been altered.
-Syncing disks.
-</code></pre>
-<h2 id="3打开虚拟机使用-存储空间管理员-扩容即可">3）打开虚拟机，使用 存储空间管理员 扩容即可</h2>
-<p>点 <code>管理</code>，按提示操作</p>
-<figure data-type="image" tabindex="1"><img src="https://fejich.github.io/post-images/1631242219179.png" alt="" loading="lazy"></figure>
 ]]></content>
     </entry>
 </feed>
