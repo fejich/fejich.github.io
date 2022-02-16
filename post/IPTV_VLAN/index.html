@@ -1,0 +1,336 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>广东电信IPTV 单线复用记录 | 瞎折腾分享</title>
+<link rel="shortcut icon" href="https://fejich.github.io/favicon.ico?v=1645028944755">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://fejich.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="广东电信IPTV 单线复用记录 | 瞎折腾分享 - Atom Feed" href="https://fejich.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="📌账号信息
+电信光猫超级用户
+
+telecomadmin
+nE7jA%5m
+
+IPTV拨号账号密码
+
+gdiptv@iptv.gd
+password
+
+📖思路
+1）光猫设置 VLAN 透传
+
+①截图记录电信下发的默认的设置，分别是 上网..." />
+    <meta name="keywords" content="IPTV,OpenWRT" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://fejich.github.io">
+  <img class="avatar" src="https://fejich.github.io/images/avatar.png?v=1645028944755" alt="">
+  </a>
+  <h1 class="site-title">
+    瞎折腾分享
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              广东电信IPTV 单线复用记录
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-02-13
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://fejich.github.io/tag/iptv/" class="post-tag">
+                  # IPTV
+                </a>
+              
+                <a href="https://fejich.github.io/tag/openwrt/" class="post-tag">
+                  # OpenWRT
+                </a>
+              
+            </div>
+            
+              <img class="post-feature-image" src="https://fejich.github.io/post-images/IPTV_VLAN.png" alt="">
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h2 id="账号信息">📌账号信息</h2>
+<h3 id="电信光猫超级用户">电信光猫超级用户</h3>
+<ul>
+<li>telecomadmin</li>
+<li>nE7jA%5m</li>
+</ul>
+<h3 id="iptv拨号账号密码">IPTV拨号账号密码</h3>
+<ul>
+<li>gdiptv@iptv.gd</li>
+<li>password</li>
+</ul>
+<h2 id="思路">📖思路</h2>
+<h3 id="1光猫设置-vlan-透传">1）光猫设置 VLAN 透传</h3>
+<p><img src="https://fejich.github.io/post-images/1644718425274.png" alt="" loading="lazy"><br>
+①截图记录电信下发的默认的设置，分别是 <code>上网</code> 跟 <code>IPTV</code> 两个业务连接<br>
+最主要是记录下每个业务的 VLAN ID</p>
+<blockquote>
+<p>每个地区各有区别，像我这边只有 IPTV业务 有 VLAN ID</p>
+</blockquote>
+<p>②保存完成后<code>删掉</code>电信下发的两个默认的连接。<br>
+按上图所示新建一个连接，光猫就设置完毕。</p>
+<blockquote>
+<p><code>透传</code>即透明传输，光猫将不处理业务 VLAN<br>
+由路由器来完成 VLAN 的拆包，即收到光猫的数据时去除 VLAN 标签，把数据发给光猫时打上 VLAN<br>
+这样就可以减少光猫负担，让光猫真的只做本职工作：光电转换。</p>
+</blockquote>
+<p>这个应该是 上网 与 IPTV 单线复用的最优使用方式</p>
+<h3 id="2路由器设置-iptv-专网拨号">2）路由器设置 IPTV 专网拨号</h3>
+<p>打开 网络 ⇢ 交换机 页面<br>
+按下图方式添加 <code>电信IPTV业务</code> 的 VLAN ID，会建立一张虚拟网卡（eth0.45）<br>
+<img src="https://fejich.github.io/post-images/1644718520325.png" alt="" loading="lazy"></p>
+<p>打开 网络 ⇢ 接口 页面<br>
+添加新接口，名称 <code>IPTV</code> 协议选 <code>PPPoE</code> 接口选 <code>eth0.45</code><br>
+填上 IPTV拨号账号密码<br>
+即可在不影响上网前提下接入 IPTV 专网<br>
+<img src="https://fejich.github.io/post-images/1644718532930.png" alt="" loading="lazy">!<br>
+<img src="https://fejich.github.io/post-images/1644718542818.png" alt="" loading="lazy"><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code></p>
+<h3 id="3通过出口设备方式指定静态路由">3）通过出口设备方式指定静态路由</h3>
+<h4 id="rtsp-单播">RTSP 单播</h4>
+<p>添加 单播源 用到的IP（具体得通过抓包 IPTV 机顶盒获取）<br>
+网段的计算到：https://ipjisuanqi.com <code>IP地址计算器网站</code> 获取</p>
+<ul>
+<li>添加路由</li>
+</ul>
+<pre><code>ip route add 183.59.0.0/16 dev pppoe-IPTV
+ip route add 125.88.54.0/24 dev pppoe-IPTV
+</code></pre>
+<ul>
+<li>删除路由</li>
+</ul>
+<pre><code>ip route del 183.59.0.0/16 dev pppoe-IPTV
+ip route del 125.88.54.0/24 dev pppoe-IPTV
+</code></pre>
+<h4 id="rtp-组播">RTP 组播</h4>
+<ul>
+<li>广州电信广东IPTV列表（IGMP/RTP组播地址）：https://github.com/Tzwcard/ChinaTelecom-GuangdongIPTV-RTP-List</li>
+</ul>
+<p><strong><code>注意</code></strong>：组播还需要配置防火墙允许相应组播端口的传入流量方可正常工作<br>
+广东电信是 <code>5146</code> 端口</p>
+<p>开启 UDPXY 转换组播流为 <code>http流</code></p>
+<pre><code>udpxy -S -p 4000 -m pppoe-IPTV
+</code></pre>
+<p>关闭 UDPXY</p>
+<pre><code>killall udpxy
+</code></pre>
+<p>打开状态查看运行情况：http://192.168.168.1:4000/status</p>
+<h4 id="自动化">自动化</h4>
+<p>添加 hotplug 事件脚本，可以实现相应接口上落线时候运行脚本</p>
+<p><code>vi /etc/hotplug.d/iface/00-IPTV.sh</code></p>
+<blockquote>
+<p>按实际需要编辑完脚本后，记得 chmod +x 添加可执行权限</p>
+</blockquote>
+<pre><code>#!/bin/sh
+
+if [ &quot;$INTERFACE&quot; = &quot;IPTV&quot; ] ; then
+
+case &quot;$ACTION&quot; in
+ifup)
+/root/iptv-up.sh
+udpxy -S -p 4000 -m pppoe-IPTV
+#ip route add 183.59.0.0/16 dev pppoe-IPTV
+#ip route add 125.88.54.0/24 dev pppoe-IPTV
+;;
+
+ifdown)
+/root/iptv-down.sh
+killall udpxy
+#ip route del 183.59.0.0/16 dev pppoe-IPTV
+#ip route del 125.88.54.0/24 dev pppoe-IPTV
+;;
+esac
+
+fi
+</code></pre>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%B4%A6%E5%8F%B7%E4%BF%A1%E6%81%AF">📌账号信息</a>
+<ul>
+<li><a href="#%E7%94%B5%E4%BF%A1%E5%85%89%E7%8C%AB%E8%B6%85%E7%BA%A7%E7%94%A8%E6%88%B7">电信光猫超级用户</a></li>
+<li><a href="#iptv%E6%8B%A8%E5%8F%B7%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81">IPTV拨号账号密码</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%9D%E8%B7%AF">📖思路</a>
+<ul>
+<li><a href="#1%E5%85%89%E7%8C%AB%E8%AE%BE%E7%BD%AE-vlan-%E9%80%8F%E4%BC%A0">1）光猫设置 VLAN 透传</a></li>
+<li><a href="#2%E8%B7%AF%E7%94%B1%E5%99%A8%E8%AE%BE%E7%BD%AE-iptv-%E4%B8%93%E7%BD%91%E6%8B%A8%E5%8F%B7">2）路由器设置 IPTV 专网拨号</a></li>
+<li><a href="#3%E9%80%9A%E8%BF%87%E5%87%BA%E5%8F%A3%E8%AE%BE%E5%A4%87%E6%96%B9%E5%BC%8F%E6%8C%87%E5%AE%9A%E9%9D%99%E6%80%81%E8%B7%AF%E7%94%B1">3）通过出口设备方式指定静态路由</a>
+<ul>
+<li><a href="#rtsp-%E5%8D%95%E6%92%AD">RTSP 单播</a></li>
+<li><a href="#rtp-%E7%BB%84%E6%92%AD">RTP 组播</a></li>
+<li><a href="#%E8%87%AA%E5%8A%A8%E5%8C%96">自动化</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://fejich.github.io/post/gua-he-kvm-nei-he-xu-ni-ji-shi-yong-de-hei-qun-hui-ds918yin-dao-ji-cheng-virtio-qu-dong/">
+              <h3 class="post-title">
+                适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动）
+              </h3>
+            </a>
+          </div>
+        
+
+        
+          
+            <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+
+<script>
+
+  var gitalk = new Gitalk({
+    clientID: '1f364b01319957ce70a6',
+    clientSecret: 'a8ebc492b68a07d365311004ede1aa2525a0f159',
+    repo: 'fejich.github.io',
+    owner: 'fejich',
+    admin: ['fejich'],
+    id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
+
+  gitalk.render('gitalk-container')
+
+</script>
+
+          
+
+          
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://fejich.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

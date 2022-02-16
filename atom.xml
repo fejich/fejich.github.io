@@ -2,14 +2,119 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://fejich.github.io</id>
     <title>瞎折腾分享</title>
-    <updated>2021-09-13T10:54:47.390Z</updated>
+    <updated>2022-02-16T16:29:06.691Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://fejich.github.io"/>
     <link rel="self" href="https://fejich.github.io/atom.xml"/>
     <subtitle>温故而知新</subtitle>
     <logo>https://fejich.github.io/images/avatar.png</logo>
     <icon>https://fejich.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2021, 瞎折腾分享</rights>
+    <rights>All rights reserved 2022, 瞎折腾分享</rights>
+    <entry>
+        <title type="html"><![CDATA[广东电信IPTV 单线复用记录]]></title>
+        <id>https://fejich.github.io/post/IPTV_VLAN/</id>
+        <link href="https://fejich.github.io/post/IPTV_VLAN/">
+        </link>
+        <updated>2022-02-13T02:11:23.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="账号信息">📌账号信息</h2>
+<h3 id="电信光猫超级用户">电信光猫超级用户</h3>
+<ul>
+<li>telecomadmin</li>
+<li>nE7jA%5m</li>
+</ul>
+<h3 id="iptv拨号账号密码">IPTV拨号账号密码</h3>
+<ul>
+<li>gdiptv@iptv.gd</li>
+<li>password</li>
+</ul>
+<h2 id="思路">📖思路</h2>
+<h3 id="1光猫设置-vlan-透传">1）光猫设置 VLAN 透传</h3>
+<p><img src="https://fejich.github.io/post-images/1644718425274.png" alt="" loading="lazy"><br>
+①截图记录电信下发的默认的设置，分别是 <code>上网</code> 跟 <code>IPTV</code> 两个业务连接<br>
+最主要是记录下每个业务的 VLAN ID</p>
+<blockquote>
+<p>每个地区各有区别，像我这边只有 IPTV业务 有 VLAN ID</p>
+</blockquote>
+<p>②保存完成后<code>删掉</code>电信下发的两个默认的连接。<br>
+按上图所示新建一个连接，光猫就设置完毕。</p>
+<blockquote>
+<p><code>透传</code>即透明传输，光猫将不处理业务 VLAN<br>
+由路由器来完成 VLAN 的拆包，即收到光猫的数据时去除 VLAN 标签，把数据发给光猫时打上 VLAN<br>
+这样就可以减少光猫负担，让光猫真的只做本职工作：光电转换。</p>
+</blockquote>
+<p>这个应该是 上网 与 IPTV 单线复用的最优使用方式</p>
+<h3 id="2路由器设置-iptv-专网拨号">2）路由器设置 IPTV 专网拨号</h3>
+<p>打开 网络 ⇢ 交换机 页面<br>
+按下图方式添加 <code>电信IPTV业务</code> 的 VLAN ID，会建立一张虚拟网卡（eth0.45）<br>
+<img src="https://fejich.github.io/post-images/1644718520325.png" alt="" loading="lazy"></p>
+<p>打开 网络 ⇢ 接口 页面<br>
+添加新接口，名称 <code>IPTV</code> 协议选 <code>PPPoE</code> 接口选 <code>eth0.45</code><br>
+填上 IPTV拨号账号密码<br>
+即可在不影响上网前提下接入 IPTV 专网<br>
+<img src="https://fejich.github.io/post-images/1644718532930.png" alt="" loading="lazy">!<br>
+<img src="https://fejich.github.io/post-images/1644718542818.png" alt="" loading="lazy"><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code><br>
+<strong>切记</strong>不要钩 <code>使用默认网关</code></p>
+<h3 id="3通过出口设备方式指定静态路由">3）通过出口设备方式指定静态路由</h3>
+<h4 id="rtsp-单播">RTSP 单播</h4>
+<p>添加 单播源 用到的IP（具体得通过抓包 IPTV 机顶盒获取）<br>
+网段的计算到：https://ipjisuanqi.com <code>IP地址计算器网站</code> 获取</p>
+<ul>
+<li>添加路由</li>
+</ul>
+<pre><code>ip route add 183.59.0.0/16 dev pppoe-IPTV
+ip route add 125.88.54.0/24 dev pppoe-IPTV
+</code></pre>
+<ul>
+<li>删除路由</li>
+</ul>
+<pre><code>ip route del 183.59.0.0/16 dev pppoe-IPTV
+ip route del 125.88.54.0/24 dev pppoe-IPTV
+</code></pre>
+<h4 id="rtp-组播">RTP 组播</h4>
+<ul>
+<li>广州电信广东IPTV列表（IGMP/RTP组播地址）：https://github.com/Tzwcard/ChinaTelecom-GuangdongIPTV-RTP-List</li>
+</ul>
+<p><strong><code>注意</code></strong>：组播还需要配置防火墙允许相应组播端口的传入流量方可正常工作<br>
+广东电信是 <code>5146</code> 端口</p>
+<p>开启 UDPXY 转换组播流为 <code>http流</code></p>
+<pre><code>udpxy -S -p 4000 -m pppoe-IPTV
+</code></pre>
+<p>关闭 UDPXY</p>
+<pre><code>killall udpxy
+</code></pre>
+<p>打开状态查看运行情况：http://192.168.168.1:4000/status</p>
+<h4 id="自动化">自动化</h4>
+<p>添加 hotplug 事件脚本，可以实现相应接口上落线时候运行脚本</p>
+<p><code>vi /etc/hotplug.d/iface/00-IPTV.sh</code></p>
+<blockquote>
+<p>按实际需要编辑完脚本后，记得 chmod +x 添加可执行权限</p>
+</blockquote>
+<pre><code>#!/bin/sh
+
+if [ &quot;$INTERFACE&quot; = &quot;IPTV&quot; ] ; then
+
+case &quot;$ACTION&quot; in
+ifup)
+/root/iptv-up.sh
+udpxy -S -p 4000 -m pppoe-IPTV
+#ip route add 183.59.0.0/16 dev pppoe-IPTV
+#ip route add 125.88.54.0/24 dev pppoe-IPTV
+;;
+
+ifdown)
+/root/iptv-down.sh
+killall udpxy
+#ip route del 183.59.0.0/16 dev pppoe-IPTV
+#ip route del 125.88.54.0/24 dev pppoe-IPTV
+;;
+esac
+
+fi
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[适合 KVM 内核虚拟机使用的 黑群晖DS918+引导（集成 VirtIO 驱动）]]></title>
         <id>https://fejich.github.io/post/gua-he-kvm-nei-he-xu-ni-ji-shi-yong-de-hei-qun-hui-ds918yin-dao-ji-cheng-virtio-qu-dong/</id>
@@ -506,38 +611,6 @@ done
     ffmpeg -i &quot;${file}&quot; -map 0:2 &quot;${filename}.map2.ass&quot; -map 0:3 &quot;${filename}.map3.ass&quot; -map 0:4 &quot;${filename}.map4.ass&quot; -map 0:5 &quot;${filename}.map5.ass&quot;
 done
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[SSH免密登录OpenWRT路由器并执行命令]]></title>
-        <id>https://fejich.github.io/post/ssh-mian-mi-deng-lu-openwrt-lu-you-qi-bing-zhi-xing-ming-ling/</id>
-        <link href="https://fejich.github.io/post/ssh-mian-mi-deng-lu-openwrt-lu-you-qi-bing-zhi-xing-ming-ling/">
-        </link>
-        <updated>2021-09-07T11:29:36.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="前言">📖前言</h2>
-<p><code>Dropbear</code>是一款基于ssh协议的轻量sshd服务器，与OpenSSH相比，他更简洁，更小巧，运行起来占用的内存也更少。</p>
-<p>每一个普通用户登录，OpenSSH会开两个sshd进程，而dropbear只开一个进程，所以其对硬件要求更低，也更利于系统的运行。</p>
-<p>Dropbear常用于“嵌入”式的Linux（或其他Unix）系统，<strong>OpenWRT 路由系统就是其中之一</strong></p>
-<h2 id="️实际操作">⚙️实际操作</h2>
-<h3 id="1配置-ssh-密钥">1）配置 ssh 密钥</h3>
-<p><code>ssh-keygen -t rsa</code></p>
-<blockquote>
-<p>连续三次回车,即在本地主机上生成了公钥和私钥,不设置密码</p>
-</blockquote>
-<p><code>cat ~/.ssh/id_rsa.pub | ssh -p 22 root@192.168.168.1 'cat &gt;&gt; /etc/dropbear/authorized_keys'</code></p>
-<blockquote>
-<p>将本地密钥写入到路由信任列表内</p>
-</blockquote>
-<h3 id="2测试免密登录路由器并执行命令">2）测试免密登录路由器并执行命令</h3>
-<p><code>ssh -p 22 root@192.168.168.1 &quot;touch /root/test ; ls&quot;</code></p>
-<h3 id="3配置-crontab-定时执行命令">3）配置 crontab 定时执行命令</h3>
-<p><code>crontab -e</code></p>
-<pre><code class="language-bash">#凌晨4点重启路由+5点进行时间同步
-0 4 * * * ssh -p 22 root@192.168.168.1 &quot;reboot&quot;
-0 5 * * * ssh -p 22 root@192.168.168.1 &quot;ntpd -n -q -p ntp.aliyun.com&quot;
-</code></pre>
-<h2 id="参考">🎈参考</h2>
-<p><a href="https://www.jqhtml.com/61355.html">极路由上的dropbear</a></p>
 ]]></content>
     </entry>
 </feed>
